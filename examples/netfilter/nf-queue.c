@@ -41,14 +41,14 @@ static int parse_attr_cb(const struct nlattr *attr, void *data)
 	case NFQA_TIMESTAMP:
 		if (mnl_attr_validate2(attr, MNL_TYPE_UNSPEC,
 		    sizeof(struct nfqnl_msg_packet_timestamp)) < 0) {
-			perror("mnl_attr_validate");
+			perror("mnl_attr_validate2");
 			return MNL_CB_ERROR;
 		}
 		break;
 	case NFQA_HWADDR:
 		if (mnl_attr_validate2(attr, MNL_TYPE_UNSPEC,
 		    sizeof(struct nfqnl_msg_packet_hw)) < 0) {
-			perror("mnl_attr_validate");
+			perror("mnl_attr_validate2");
 			return MNL_CB_ERROR;
 		}
 		break;
@@ -69,9 +69,10 @@ static int queue_cb(const struct nlmsghdr *nlh, void *data)
 	if (tb[NFQA_PACKET_HDR]) {
 		ph = mnl_attr_get_payload(tb[NFQA_PACKET_HDR]);
 		id = ntohl(ph->packet_id);
+
+		printf("packet received (id=%u hw=0x%04x hook=%u)\n",
+		       id, ntohs(ph->hw_protocol), ph->hook);
 	}
-	printf("packet received (id=%u hw=0x%04x hook=%u)\n",
-		id, ntohs(ph->hw_protocol), ph->hook);
 
 	return MNL_CB_OK + id;
 }
@@ -253,28 +254,28 @@ int main(int argc, char *argv[])
 	nlh = nfq_build_cfg_pf_request(nl, NFQNL_CFG_CMD_PF_UNBIND);
 
 	if (mnl_socket_sendto(nl, NULL, 0) < 0) {
-		perror("mnl_socket_send");
+		perror("mnl_socket_sendto");
 		exit(EXIT_FAILURE);
 	}
 
 	nlh = nfq_build_cfg_pf_request(nl, NFQNL_CFG_CMD_PF_BIND);
 
 	if (mnl_socket_sendto(nl, NULL, 0) < 0) {
-		perror("mnl_socket_send");
+		perror("mnl_socket_sendto");
 		exit(EXIT_FAILURE);
 	}
 
 	nlh = nfq_build_cfg_request(nl, NFQNL_CFG_CMD_BIND, queue_num);
 
 	if (mnl_socket_sendto(nl, NULL, 0) < 0) {
-		perror("mnl_socket_send");
+		perror("mnl_socket_sendto");
 		exit(EXIT_FAILURE);
 	}
 
 	nlh = nfq_build_cfg_params(nl, NFQNL_COPY_PACKET, 0xFFFF, queue_num);
 
 	if (mnl_socket_sendto(nl, NULL, 0) < 0) {
-		perror("mnl_socket_send");
+		perror("mnl_socket_sendto");
 		exit(EXIT_FAILURE);
 	}
 
