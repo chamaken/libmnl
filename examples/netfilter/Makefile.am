@@ -5,7 +5,10 @@ check_PROGRAMS = nf-queue \
 		 nfct-dump \
 		 nfct-event \
 		 nfct-create-batch \
-		 nfct-daemon
+		 nfct-daemon \
+		 nfct-counter \
+		 nfct-dump-stats-cpu \
+		 nfexp-dump-stats-cpu
 
 nf_queue_SOURCES = nf-queue.c
 nf_queue_LDADD = ../../src/libmnl.la
@@ -24,3 +27,12 @@ nfct_event_LDADD = ../../src/libmnl.la
 
 nfct_create_batch_SOURCES = nfct-create-batch.c
 nfct_create_batch_LDADD = ../../src/libmnl.la
+
+nfct_counter_SOURCES = nfct-counter.c
+nfct_counter_LDADD = ../../src/libmnl.la
+
+nfct_dump_stats_cpu_SOURCES = nfct-dump-stats-cpu.c
+nfct_dump_stats_cpu_LDADD = ../../src/libmnl.la
+
+nfexp_dump_stats_cpu_SOURCES = nfexp-dump-stats-cpu.c
+nfexp_dump_stats_cpu_LDADD = ../../src/libmnl.la
