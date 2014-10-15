@@ -19,7 +19,15 @@ extern "C" {
 #define MNL_SOCKET_AUTOPID	0
 #define MNL_SOCKET_BUFFER_SIZE (getpagesize() < 8192L ? getpagesize() : 8192L)
 
+enum mnl_ring_type {
+	MNL_RING_RX,
+	MNL_RING_TX,
+};
+
 struct mnl_socket;
+struct mnl_ring;
+
+#define MNL_FRAME_PAYLOAD(frame) ((void *)(frame) + NL_MMAP_HDRLEN)
 
 extern struct mnl_socket *mnl_socket_open(int type);
 extern struct mnl_socket *mnl_socket_fdopen(int fd);
@@ -31,6 +39,14 @@ extern ssize_t mnl_socket_sendto(const struct mnl_socket *nl, const void *req, s
 extern ssize_t mnl_socket_recvfrom(const struct mnl_socket *nl, void *buf, size_t siz);
 extern int mnl_socket_setsockopt(const struct mnl_socket *nl, int type, void *buf, socklen_t len);
 extern int mnl_socket_getsockopt(const struct mnl_socket *nl, int type, void *buf, socklen_t *len);
+extern int mnl_socket_set_ringopt(struct mnl_socket *nl, enum mnl_ring_type type,
+				  unsigned int block_size, unsigned int block_nf,
+				  unsigned int frame_size, unsigned int frame_nr);
+extern int mnl_socket_map_ring(struct mnl_socket *nl);
+extern int mnl_socket_unmap_ring(struct mnl_socket *nl);
+extern struct mnl_ring *mnl_socket_get_ring(const struct mnl_socket *nl, enum mnl_ring_type type);
+extern void mnl_ring_advance(struct mnl_ring *ring);
+extern struct nl_mmap_hdr *mnl_ring_get_frame(const struct mnl_ring *ring);
 
 /*
  * Netlink message API
@@ -75,6 +91,7 @@ extern void mnl_nlmsg_batch_reset(struct mnl_nlmsg_batch *b);
 extern void *mnl_nlmsg_batch_head(struct mnl_nlmsg_batch *b);
 extern void *mnl_nlmsg_batch_current(struct mnl_nlmsg_batch *b);
 extern bool mnl_nlmsg_batch_is_empty(struct mnl_nlmsg_batch *b);
+extern void mnl_nlmsg_batch_reset_buffer(struct mnl_nlmsg_batch *b, void *buf, size_t limit);
 
 /*
  * Netlink attributes API

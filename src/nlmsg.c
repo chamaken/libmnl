@@ -569,5 +569,34 @@ bool mnl_nlmsg_batch_is_empty(struct mnl_nlmsg_batch *b)
 EXPORT_SYMBOL(mnl_nlmsg_batch_is_empty);
 
 /**
+ * mnl_nlmsg_batch_reset_buffer - reset to the new buffer
+ * \param buf pointer to the new (mmaped tx frame) buffer that will store this
+ *        batch
+ * \param limit maximum size of the batch (should be half of
+ *        nl_mmap_req.frame_size)
+ *
+ * This function is for mmap tx frame, allows to set new buffer (frame) and
+ * reset a batch, so you can reuse it to create a new one. This function moves
+ * the last message which does not fit the batch to the head of the new buffer,
+ * if any.
+ */
+void mnl_nlmsg_batch_reset_buffer(struct mnl_nlmsg_batch *b, void *buf, size_t limit)
+{
+	if (b->overflow) {
+		struct nlmsghdr *nlh = b->cur;
+		memcpy(buf, b->cur, nlh->nlmsg_len);
+		b->buflen = nlh->nlmsg_len;
+		b->cur = buf + b->buflen;
+		b->overflow = false;
+	} else {
+		b->buflen = 0;
+		b->cur = buf;
+	}
+	b->buf = buf;
+	b->limit = limit;
+}
+EXPORT_SYMBOL(mnl_nlmsg_batch_reset_buffer);
+
+/**
  * @}
  */

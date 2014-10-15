@@ -65,7 +65,6 @@ global:
   mnl_socket_recvfrom;
   mnl_socket_sendto;
   mnl_socket_setsockopt;
-
 local: *;
 };
 
@@ -76,3 +75,13 @@ LIBMNL_1.1 {
 LIBMNL_1.2 {
   mnl_socket_fdopen;
 } LIBMNL_1.1;
+
+LIBMNL_1.3 {
+  mnl_socket_set_ringopt;
+  mnl_socket_map_ring;
+  mnl_socket_unmap_ring;
+  mnl_socket_get_ring;
+  mnl_ring_advance;
+  mnl_ring_get_frame;
+  mnl_nlmsg_batch_reset_buffer;
+} LIBMNL_1.2;
