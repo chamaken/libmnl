@@ -517,7 +517,7 @@ struct mnl_ring *mnl_socket_get_ring(const struct mnl_socket *nl, enum mnl_ring_
 		return NULL;
 		break;
 	}
-	if (ring->ring == NULL) {
+	if (ring == NULL || ring->ring == NULL) {
 		errno = EBADR;
 		return NULL;
 	}
