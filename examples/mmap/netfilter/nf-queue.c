@@ -7,15 +7,11 @@
 #include <poll.h>
 #include <errno.h>
 #include <arpa/inet.h>
+#include <sys/mman.h>
 
 #include <libmnl/libmnl.h>
 #include <linux/netfilter.h>
 #include <linux/netfilter/nfnetlink.h>
-
-#ifndef aligned_be64
-#define aligned_be64 u_int64_t __attribute__((aligned(8)))
-#endif
-
 #include <linux/netfilter/nfnetlink_queue.h>
 
 static int parse_attr_cb(const struct nlattr *attr, void *data)
@@ -250,7 +246,7 @@ int main(int argc, char *argv[])
 		perror("mnl_socket_set_ringopt - TX");
 		exit(EXIT_FAILURE);
 	}
-	if (mnl_socket_map_ring(nl) < 0) {
+	if (mnl_socket_map_ring(nl, MAP_SHARED) < 0) {
 		perror("mnl_socket_map_ring");
 		exit(EXIT_FAILURE);
 	}

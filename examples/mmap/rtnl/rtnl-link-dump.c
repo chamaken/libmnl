@@ -6,6 +6,7 @@
 #include <poll.h>
 #include <errno.h>
 #include <arpa/inet.h>
+#include <sys/mman.h>
 
 #include <libmnl/libmnl.h>
 #include <linux/if.h>
@@ -140,7 +141,7 @@ int main(void)
 		perror("mnl_socket_set_ringopt - RX");
 		exit(EXIT_FAILURE);
 	}
-	if (mnl_socket_map_ring(nl) < 0) {
+	if (mnl_socket_map_ring(nl, MAP_SHARED) < 0) {
 		perror("mnl_socket_map_ring");
 		exit(EXIT_FAILURE);
 	}
