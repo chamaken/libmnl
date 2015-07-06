@@ -434,7 +434,7 @@ static inline size_t ring_size(struct mnl_ring *ring)
  * mnl_socket_set_ringopt(). On success, 0 is returned. On error, this function
  * returns -1 and errno is appropriately set and req parameter
  */
-int mnl_socket_map_ring(struct mnl_socket *nl)
+int mnl_socket_map_ring(struct mnl_socket *nl, int flags)
 {
 	size_t rx_size = 0, tx_size = 0;
 	struct mnl_ring *rx_ring = nl->rx_ring, *tx_ring = nl->tx_ring;
@@ -449,7 +449,7 @@ int mnl_socket_map_ring(struct mnl_socket *nl)
 		rx_size = ring_size(rx_ring);
 	if (tx_ring != NULL)
 		tx_size = ring_size(tx_ring);
-	ring = mmap(NULL, tx_size + rx_size, PROT_READ | PROT_WRITE, MAP_SHARED, nl->fd, 0);
+	ring = mmap(NULL, tx_size + rx_size, PROT_READ | PROT_WRITE, flags, nl->fd, 0);
 	if (ring == MAP_FAILED)
 		return -1;
 
