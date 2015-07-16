@@ -63,8 +63,8 @@ static int queue_cb(const struct nlmsghdr *nlh, void *data)
 		ph = mnl_attr_get_payload(tb[NFQA_PACKET_HDR]);
 		id = ntohl(ph->packet_id);
 
-		printf("packet received (id=%u hw=0x%04x hook=%u)\n",
-		       id, ntohs(ph->hw_protocol), ph->hook);
+		/* printf("packet received (id=%u hw=0x%04x hook=%u)\n",
+		 *         id, ntohs(ph->hw_protocol), ph->hook); */
 	}
 
 	return MNL_CB_OK + id;
@@ -158,10 +158,10 @@ nfq_build_verdict(char *buf, int id, int queue_num, int verd)
 int main(int argc, char *argv[])
 {
 	struct mnl_socket *nl;
-	char buf[MNL_SOCKET_BUFFER_SIZE];
+	char buf[4194304]; /* 16384 * 256 see mmaped example */
 	struct nlmsghdr *nlh;
 	int ret;
-	unsigned int portid, queue_num;
+	unsigned int portid, queue_num, count = 0;
 
 	if (argc != 2) {
 		printf("Usage: %s [queue_num]\n", argv[0]);
@@ -180,6 +180,13 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	portid = mnl_socket_get_portid(nl);
+
+	/* ENOBUFS is signalled to userspace when packets were lost
+	 * on kernel side.  In most cases, userspace isn't interested
+	 * in this information, so turn it off.
+	 */
+	ret = 1;
+	mnl_socket_setsockopt(nl, NETLINK_NO_ENOBUFS, &ret, sizeof(int));
 
 	nlh = nfq_build_cfg_pf_request(buf, NFQNL_CFG_CMD_PF_UNBIND);
 
@@ -214,7 +221,7 @@ int main(int argc, char *argv[])
 		perror("mnl_socket_recvfrom");
 		exit(EXIT_FAILURE);
 	}
-	while (ret > 0) {
+	while (ret > 0 && count++ < 10000) {
 		uint32_t id;
 
 		ret = mnl_cb_run(buf, ret, 0, portid, queue_cb, NULL);

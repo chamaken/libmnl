@@ -66,8 +66,8 @@ static int queue_cb(const struct nlmsghdr *nlh, void *data)
 		ph = mnl_attr_get_payload(tb[NFQA_PACKET_HDR]);
 		id = ntohl(ph->packet_id);
 
-		printf("packet received (id=%u hw=0x%04x hook=%u)\n",
-		       id, ntohs(ph->hw_protocol), ph->hook);
+		/* printf("packet received (id=%u hw=0x%04x hook=%u)\n",
+		 *        id, ntohs(ph->hw_protocol), ph->hook); */
 	}
 
 	return MNL_CB_OK + id;
@@ -220,7 +220,7 @@ int main(int argc, char *argv[])
 	ssize_t len;
 	void *ptr;
 	int ret;
-	unsigned int portid, queue_num;
+	unsigned int portid, queue_num, count = 0;
 	struct mnl_ring *txring, *rxring;
 	struct nl_mmap_hdr *frame;
 
@@ -269,7 +269,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	while (1) {
+	while (count++ < 10000) {
 		uint32_t id;
 
 		frame = mnl_ring_get_frame(rxring);

@@ -1,0 +1,93 @@
+#!/bin/bash
+
+# host br1:
+#	192.168.1.1/24
+# guest tap as eth0:
+#	192.168.1.201/24
+#	run inetd discard service
+# 	iptables -t raw -I PREROUTING -i eth0 -p udp --dport 9 -j NFQUEUE --queue-num 5
+#       perf stat -- nf-queue 5
+#
+# orig: 1844 task-clock (msec)
+#	9129 context-switches
+# mmap: 1443 task-clock (msec)
+#	13226 context-switches#
+
+modprobe pktgen
+
+function pgset() {
+    local result
+
+    echo $1 > $PGDEV
+
+    result=`cat $PGDEV | fgrep "Result: OK:"`
+    if [ "$result" = "" ]; then
+         cat $PGDEV | fgrep Result:
+    fi
+}
+
+# Config Start Here -----------------------------------------------------------
+
+
+# thread config
+# Each CPU has its own thread. One CPU example. We add eth1.
+
+SRCDEV=br1
+# for PGDEV in /proc/net/pktgen/kpktgend_*; do
+PGDEV=/proc/net/pktgen/kpktgend_0
+    echo "Removing all devices"
+    pgset "rem_device_all"
+    echo "Adding $SRCDEV"
+    pgset "add_device $SRCDEV"
+# done
+
+
+# device config
+# delay 0
+# We need to do alloc for every skb since we cannot clone here.
+
+CLONE_SKB="clone_skb 0"
+# NIC adds 4 bytes CRC
+PKT_SIZE="pkt_size 60"
+
+# COUNT 0 means forever
+COUNT="count 0"
+#COUNT="count 4294967295"
+#COUUNT="count 3000000000"
+DELAY="delay 0"
+
+PGDEV=/proc/net/pktgen/${SRCDEV}
+  echo "Configuring $SRCDEV"
+ pgset "$COUNT"
+ pgset "$CLONE_SKB"
+ pgset "$PKT_SIZE"
+ pgset "$DELAY"
+ # Random address with in the min-max range
+ pgset "flag IPSRC_RND"
+ pgset "src_min 172.16.0.0"
+ pgset "src_max 172.23.255.255"
+ pgset "dst 192.168.1.201"
+# pgset "flag IPDST_RND"
+# pgset "dst_min 172.24.0.0"
+# pgset "dst_max 172.31.255.255"
+# pgset "flag UDPSRC_RND"
+# pgset "udp_src_min 1"
+# pgset "udp_src_max 1024"
+# pgset "flag UDPDST_RND"
+# pgset "udp_dst_min 1025"
+# pgset "udp_dst_max 65535"
+
+ # 8k Concurrent flows at 4 pkts
+ pgset "flows 8192"
+ pgset "flowlen 4"
+
+ pgset "dst_mac  52:54:00:12:34:5a"
+
+# Time to run
+PGDEV=/proc/net/pktgen/pgctrl
+
+ echo "Running... ctrl^C to stop"
+ trap true INT
+ pgset "start"
+ echo "Done"
+ cat /proc/net/pktgen/${SRCDEV}
