@@ -78,7 +78,7 @@ nfq_build_cfg_pf_request(struct mnl_ring *ring, uint8_t command)
 {
 	struct nl_mmap_hdr *frame;
 
-	frame = mnl_ring_get_frame(ring);
+	frame = mnl_ring_current_frame(ring);
 	if (frame->nm_status != NL_MMAP_STATUS_UNUSED)
 		return NULL;
 	mnl_ring_advance(ring);
@@ -107,7 +107,7 @@ nfq_build_cfg_request(struct mnl_ring *ring, uint8_t command, int queue_num)
 {
 	struct nl_mmap_hdr *frame;
 
-	frame = mnl_ring_get_frame(ring);
+	frame = mnl_ring_current_frame(ring);
 	if (frame->nm_status != NL_MMAP_STATUS_UNUSED)
 		return NULL;
 	mnl_ring_advance(ring);
@@ -137,7 +137,7 @@ nfq_build_cfg_params(struct mnl_ring *ring, uint8_t mode, int range, int queue_n
 {
 	struct nl_mmap_hdr *frame;
 
-	frame = mnl_ring_get_frame(ring);
+	frame = mnl_ring_current_frame(ring);
 	if (frame->nm_status != NL_MMAP_STATUS_UNUSED)
 		return NULL;
 	mnl_ring_advance(ring);
@@ -167,7 +167,7 @@ nfq_build_verdict(struct mnl_ring *ring, int id, int queue_num, int verd)
 {
 	struct nl_mmap_hdr *frame;
 
-	frame = mnl_ring_get_frame(ring);
+	frame = mnl_ring_current_frame(ring);
 	if (frame->nm_status != NL_MMAP_STATUS_UNUSED)
 		return NULL;
 	mnl_ring_advance(ring);
@@ -272,7 +272,7 @@ int main(int argc, char *argv[])
 	while (count++ < 10000) {
 		uint32_t id;
 
-		frame = mnl_ring_get_frame(rxring);
+		frame = mnl_ring_current_frame(rxring);
 		if (frame->nm_status == NL_MMAP_STATUS_VALID) {
 			ptr = MNL_FRAME_PAYLOAD(frame);
 			len = frame->nm_len;

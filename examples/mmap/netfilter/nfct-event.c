@@ -258,7 +258,7 @@ int main(void)
 	}
 
 	while (1) {
-		frame = mnl_ring_get_frame(rxring);
+		frame = mnl_ring_current_frame(rxring);
 		if (frame->nm_status == NL_MMAP_STATUS_VALID) {
 			if (frame->nm_len == 0)
 				goto release;

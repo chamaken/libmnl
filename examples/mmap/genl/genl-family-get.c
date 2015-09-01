@@ -241,7 +241,7 @@ int main(int argc, char *argv[])
 	rxring = mnl_socket_get_ring(nl, MNL_RING_RX);
 	txring = mnl_socket_get_ring(nl, MNL_RING_TX);
 
-	frame = mnl_ring_get_frame(txring);
+	frame = mnl_ring_current_frame(txring);
 	if (frame->nm_status != NL_MMAP_STATUS_UNUSED) {
 		fprintf(stderr, "could not get unused tx frame\n");
 		exit(EXIT_FAILURE);
@@ -277,7 +277,7 @@ int main(int argc, char *argv[])
 
 	ret = MNL_CB_OK;
 	while (ret > 0) {
-		frame = mnl_ring_get_frame(rxring);
+		frame = mnl_ring_current_frame(rxring);
 		if (frame->nm_status == NL_MMAP_STATUS_VALID) {
 			if (frame->nm_len == 0)
 				goto release;

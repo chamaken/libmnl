@@ -233,7 +233,7 @@ static int handle(struct mnl_socket *nl)
 		return -1;
 	}
 
-	frame = mnl_ring_get_frame(ring);
+	frame = mnl_ring_current_frame(ring);
 	if (frame->nm_status == NL_MMAP_STATUS_VALID) {
 		ret = frame->nm_len;
 		ptr = MNL_FRAME_PAYLOAD(frame);

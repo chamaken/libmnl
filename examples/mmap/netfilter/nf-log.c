@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
 	}
 	portid = mnl_socket_get_portid(nl);
 
-	frame = mnl_ring_get_frame(txring);
+	frame = mnl_ring_current_frame(txring);
 	nlh = nflog_build_cfg_pf_request(MNL_FRAME_PAYLOAD(frame), NFULNL_CFG_CMD_PF_UNBIND);
 	frame->nm_len = nlh->nlmsg_len;
 	frame->nm_status = NL_MMAP_STATUS_VALID;
@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
 	}
 	mnl_ring_advance(txring);
 
-	frame = mnl_ring_get_frame(txring);
+	frame = mnl_ring_current_frame(txring);
 	nlh = nflog_build_cfg_pf_request(MNL_FRAME_PAYLOAD(frame), NFULNL_CFG_CMD_PF_BIND);
 	frame->nm_len = nlh->nlmsg_len;
 	frame->nm_status = NL_MMAP_STATUS_VALID;
@@ -232,7 +232,7 @@ int main(int argc, char *argv[])
 	}
 	mnl_ring_advance(txring);
 
-	frame = mnl_ring_get_frame(txring);
+	frame = mnl_ring_current_frame(txring);
 	nlh = nflog_build_cfg_request(MNL_FRAME_PAYLOAD(frame), NFULNL_CFG_CMD_BIND, qnum);
 	frame->nm_len = nlh->nlmsg_len;
 	frame->nm_status = NL_MMAP_STATUS_VALID;
@@ -242,7 +242,7 @@ int main(int argc, char *argv[])
 	}
 	mnl_ring_advance(txring);
 
-	frame = mnl_ring_get_frame(txring);
+	frame = mnl_ring_current_frame(txring);
 	nlh = nflog_build_cfg_params(MNL_FRAME_PAYLOAD(frame), NFULNL_COPY_PACKET, 0xFFFF, qnum);
 	frame->nm_len = nlh->nlmsg_len;
 	frame->nm_status = NL_MMAP_STATUS_VALID;
@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
 
 	ret = MNL_CB_OK;
 	while (ret >= 0) {
-		frame = mnl_ring_get_frame(rxring);
+		frame = mnl_ring_current_frame(rxring);
 		if (frame->nm_status == NL_MMAP_STATUS_VALID) {
 			if (frame->nm_len == 0)
 				goto release;

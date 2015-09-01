@@ -324,7 +324,7 @@ int main(void)
 		exit(EXIT_FAILURE);
 	}
 
-	frame = mnl_ring_get_frame(txring);
+	frame = mnl_ring_current_frame(txring);
 	nlh = mnl_nlmsg_put_header(MNL_FRAME_PAYLOAD(frame));
 	nlh->nlmsg_type = (NFNL_SUBSYS_CTNETLINK << 8) | IPCTNL_MSG_CT_GET;
 	nlh->nlmsg_flags = NLM_F_REQUEST|NLM_F_DUMP;
@@ -347,7 +347,7 @@ int main(void)
 	portid = mnl_socket_get_portid(nl);
 
 	while (1) {
-		frame = mnl_ring_get_frame(rxring);
+		frame = mnl_ring_current_frame(rxring);
 		if (frame->nm_status == NL_MMAP_STATUS_VALID) {
 			if (frame->nm_len == 0)
 				goto release;

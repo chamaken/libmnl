@@ -124,7 +124,7 @@ send_batch(struct mnl_socket *nl, struct mnl_nlmsg_batch *b, int portid)
 			break;
 		}
 
-		frame = mnl_ring_get_frame(rxring);
+		frame = mnl_ring_current_frame(rxring);
 		if (frame->nm_status == NL_MMAP_STATUS_VALID) {
 			if (frame->nm_len == 0)
 				goto release;
@@ -201,7 +201,7 @@ int main(void)
 	}
 	portid = mnl_socket_get_portid(nl);
 
-	frame = mnl_ring_get_frame(txring);
+	frame = mnl_ring_current_frame(txring);
 	/* The buffer that we use to batch messages is
 	   nlmr.nm_frame_size - sizeof(struct nl_mmap_hdr), but we limit the
 	   batch to half of it since the last message that does not fit the
@@ -227,7 +227,7 @@ int main(void)
 		send_batch(nl, b, portid);
 		/* mnl_socket_advance_ring(nl, MNL_RING_TX) was called in send_batch() */
 
-		frame = mnl_ring_get_frame(txring);
+		frame = mnl_ring_current_frame(txring);
 		/* this moves the last message that did not fit into the
 		 * batch to the head of it. */
 		mnl_nlmsg_batch_reset_buffer(b, MNL_FRAME_PAYLOAD(frame),
