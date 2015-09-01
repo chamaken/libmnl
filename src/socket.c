@@ -537,25 +537,31 @@ void mnl_ring_advance(struct mnl_ring *ring)
 }
 EXPORT_SYMBOL(mnl_ring_advance);
 
-/**
- * mnl_ring_get_frame - get current frame
- * \param ring mnl_ring structure obtained via mnl_socket_get_ring()
- *
- * This function returns nl_mmap_hdr structure of current frame pointer
- */
-struct nl_mmap_hdr *mnl_ring_get_frame(const struct mnl_ring *ring)
+static inline struct nl_mmap_hdr *
+mnl_ring_get_frame(const struct mnl_ring *ring, unsigned int pos)
 {
 	unsigned int frames_per_block, block_pos, frame_off;
 
 	frames_per_block = ring->block_size / ring->frame_size;
-	block_pos = ring->head / frames_per_block;
-	frame_off = ring->head % frames_per_block;
+	block_pos = pos / frames_per_block;
+	frame_off = pos % frames_per_block;
 
 	return (struct nl_mmap_hdr *)(ring->ring
 				      + block_pos * ring->block_size
 				      + frame_off * ring->frame_size);
 }
-EXPORT_SYMBOL(mnl_ring_get_frame);
+
+/**
+ * mnl_ring_current_frame - get current frame
+ * \param ring mnl_ring structure obtained via mnl_socket_get_ring()
+ *
+ * This function returns nl_mmap_hdr structure of current frame pointer
+ */
+struct nl_mmap_hdr *mnl_ring_current_frame(const struct mnl_ring *ring)
+{
+	return mnl_ring_get_frame(ring, ring->head);
+}
+EXPORT_SYMBOL(mnl_ring_current_frame);
 
 /**
  * @}

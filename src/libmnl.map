@@ -82,6 +82,6 @@ LIBMNL_1.3 {
   mnl_socket_unmap_ring;
   mnl_socket_get_ring;
   mnl_ring_advance;
-  mnl_ring_get_frame;
+  mnl_ring_current_frame;
   mnl_nlmsg_batch_reset_buffer;
 } LIBMNL_1.2;
