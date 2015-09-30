@@ -27,7 +27,8 @@ enum mnl_ring_type {
 struct mnl_socket;
 struct mnl_ring;
 
-#define MNL_FRAME_PAYLOAD(frame) ((void *)(frame) + NL_MMAP_HDRLEN)
+#define MNL_FRAME_PAYLOAD(frame) ((struct nlmsghdr *)((uintptr_t)(frame) + NL_MMAP_HDRLEN))
+#define MNL_NLMSG_FRAME(nlh) ((struct nl_mmap_hdr *)((uintptr_t)(nlh) - NL_MMAP_HDRLEN))
 
 extern struct mnl_socket *mnl_socket_open(int type);
 extern struct mnl_socket *mnl_socket_fdopen(int fd);
