@@ -24,7 +24,7 @@ esac
 regular_CPPFLAGS="-D_FILE_OFFSET_BITS=64 -D_REENTRANT"
 regular_CFLAGS="-Wall -Waggregate-return -Wmissing-declarations \
 	-Wmissing-prototypes -Wshadow -Wstrict-prototypes \
-	-Wformat=2 -pipe"
+	-Wformat=2 -Wcast-align -Wundef -pipe"
 AC_SUBST([regular_CPPFLAGS])
 AC_SUBST([regular_CFLAGS])
 AC_CONFIG_FILES([Makefile src/Makefile include/Makefile include/libmnl/Makefile include/linux/Makefile include/linux/netfilter/Makefile examples/Makefile examples/genl/Makefile examples/kobject/Makefile examples/netfilter/Makefile examples/rtnl/Makefile examples/mmap/Makefile examples/mmap/genl/Makefile examples/mmap/kobject/Makefile examples/mmap/netfilter/Makefile examples/mmap/rtnl/Makefile libmnl.pc doxygen.cfg])
